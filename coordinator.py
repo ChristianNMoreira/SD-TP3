@@ -40,12 +40,18 @@ def coordinatorListener():
         rcv = UDPServerSocket.recvfrom(buffer_size)
         message = rcv[0].decode()
         address = rcv[1]
-        msg, prcss, content = message.split("|")
+        message = message.split("|")
+        msg = message[0]
+        prcss = message[1]
+        content = message[2]
         if msg == REQUEST:
-            with queue_lock:
-                queue.append((msg, prcss, content, address))
-        elif msg == RELEASE:
+            queue_lock.acquire()
+            queue.append((msg, prcss, content, address))
+            queue_lock.release()
+        if msg == RELEASE:
+            file_lock.acquire()
             file_lock.release()
+
 
 def coordinatorManager():
     while True:
