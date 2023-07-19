@@ -1,6 +1,7 @@
 from threading import Thread
 import socket
 import time
+from datetime import datetime
 
 REQUEST = "1"
 GRANT = "2"
@@ -23,7 +24,8 @@ def process(prcss, content, k, r):
             msg = message[0]
             prcss_rcv = message[1]
             if (msg == GRANT) and (prcss_rcv == prcss):
-                # Escrever no arquivo
+                with open('resultado.txt', 'a') as f:
+                    f.write(f"{prcss} | {datetime.now().strftime('%H:%M:%S.%f')}\n")
                 UDPClientSocket.sendto(str.encode(f"{RELEASE}|{prcss}|{content}"), server)
                 loop_rcv = False
         time.sleep(k)
