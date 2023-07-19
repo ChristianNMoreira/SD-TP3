@@ -32,4 +32,7 @@ def process(prcss, content, k, r):
 if __name__ == "__main__":
     n = int(input("n: "))
     r = int(input("r: "))
-    k = int(input("
+    k = int(input("k: "))
+
+    for ni in range(n):
+        Thread(target=process, args=(str(ni), "00000", k, r)).start()
