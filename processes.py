@@ -1,4 +1,4 @@
-from threading import Thread, Lock
+from threading import Thread
 import socket
 import time
 
@@ -15,7 +15,6 @@ def process(prcss, content, k, r):
     UDPClientSocket.sendto(str.encode(f"{REQUEST}|{prcss}|{content}"), server)
 
     for ri in range(r):
-
         loop_rcv = True
         while loop_rcv:
             rcv = UDPClientSocket.recvfrom(buffer_size)
@@ -24,9 +23,8 @@ def process(prcss, content, k, r):
             message = message.split("|")
             msg = message[0]
             prcss_rcv = message[1]
-            print(msg, prcss_rcv, prcss, prcss_rcv == prcss)
             if (msg == GRANT) and (prcss_rcv == prcss):
-                # escrever no arquivo
+                # Escrever no arquivo
                 UDPClientSocket.sendto(str.encode(f"{RELEASE}|{prcss}|{content}"), server)
                 loop_rcv = False
         time.sleep(k)
@@ -34,7 +32,4 @@ def process(prcss, content, k, r):
 if __name__ == "__main__":
     n = int(input("n: "))
     r = int(input("r: "))
-    k = int(input("k: "))
-
-    for ni in range(n):
-        Thread(target=process, args=(ni, "00000", k, r)).start()
+    k = int(input("
