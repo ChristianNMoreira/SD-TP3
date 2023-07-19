@@ -20,20 +20,33 @@ UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((IP, Port))
 
 def terminalThread():
+    global queue_lock
+    global processes_lock
+    global queue
+    global processes
+
     loop_terminal = True
     while loop_terminal:
         in_terminal = input("Input terminal: ")
         if in_terminal == "1":
-            print("fila de pedidos atual")
+            queue_lock.acquire()
+            print(queue)
+            queue_lock.release()
         if in_terminal == "2":
-            print("quantas vezes cada processo foi atendido")
+            processes_lock.acquire()
+            print(processes)
+            processes_lock.release()
         if in_terminal == "3":
             loop_terminal = False
 
 def coordinatorListener():
+    global file_lock
+    global queue_lock
+    global queue
+
     while True:
         rcv = UDPServerSocket.recvfrom(buffer_size)
-        message = rcv[0]
+        message = rcv[0].decode()
         address = rcv[1]
         message = message.split("|")
         msg = message[0]
@@ -47,19 +60,29 @@ def coordinatorListener():
             file_lock.release()
 
 def coordinatorManager():
+    global queue_lock
+    global processes_lock
+    global queue
+    global processes
+
     while True:
         queue_lock.acquire()
-        queue_first = queue.pop(0)
-        queue_lock.release()
-        msg, prcss, content, address = queue_first
-        file_lock.acquire()
-        processes_lock.acquire()
-        if not prcss in processes:
-            processes[prcss] = 1
+        if not queue == []:
+            queue_first = queue.pop(0)
+            queue_lock.release()
+            msg, prcss, content, address = queue_first
+            file_lock.acquire()
+            print(f"{msg} | {prcss} | {content}")
+            processes_lock.acquire()
+            if not prcss in processes:
+                processes[prcss] = 1
+            else:
+                processes[prcss] += 1
+            processes_lock.release()
+            UDPServerSocket.sendto(str.encode(f"{GRANT}|{prcss}|{content}"), address)
+
         else:
-            processes[prcss] += 1
-        processes_lock.release()
-        UDPServerSocket.sendto(f"2|{prcss}|{content}", address)
+            queue_lock.release()
 
 
 if __name__ == "__main__":
