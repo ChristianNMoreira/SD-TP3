@@ -27,22 +27,12 @@ def terminalThread():
                 print("Fila de pedidos atual:")
                 for item in queue:
                     print(item)
-            # queue_lock.acquire()
-            # print("Fila de pedidos atual:")
-            # for item in queue:
-            #     print(item)
-            # queue_lock.release()
 
         elif in_terminal == "2":
             with processes_lock:
                 print("Quantas vezes cada processo foi atendido:")
                 for processo, contador in processes.items():
                     print(f"Processo {processo}: {contador} vezes")
-            # processes_lock.acquire()
-            # print("Quantas vezes cada processo foi atendido:")
-            # for processo, contador in processes.items():
-            #     print(f"Processo {processo}: {contador} vezes")
-            # processes_lock.release()
         elif in_terminal == "3":
             break
 
@@ -60,7 +50,6 @@ def coordinatorListener():
             queue.append((msg, prcss, content, address))
             queue_lock.release()
         if msg == RELEASE:
-            # file_lock.acquire()
             file_lock.release()
 
 
@@ -71,13 +60,6 @@ def coordinatorManager():
                 msg, prcss, content, address = queue.pop(0)
             else:
                 continue
-        # queue_lock.acquire()
-        # if queue:
-        #     msg, prcss, content, address = queue.pop(0)
-        # else:
-        #     queue_lock.release()
-        #     continue
-        # queue_lock.release()
 
         file_lock.acquire()
         
@@ -86,15 +68,6 @@ def coordinatorManager():
                 processes[prcss] = 1
             else:
                 processes[prcss] += 1
-
-        # processes_lock.acquire()
-        # if prcss not in processes:
-        #     processes[prcss] = 1
-        # else:
-        #     processes[prcss] += 1
-        # processes_lock.release()
-        
-        # file_lock.release()
 
         UDPServerSocket.sendto(f"{GRANT}|{prcss}|{content}".encode(), address)
 
