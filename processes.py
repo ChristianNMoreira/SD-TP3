@@ -12,9 +12,8 @@ buffer_size = 1024
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 def process(prcss, content, k, r):
-    UDPClientSocket.sendto(str.encode(f"{REQUEST}|{prcss}|{content}"), server)
-
     for ri in range(r):
+        UDPClientSocket.sendto(str.encode(f"{REQUEST}|{prcss}|{content}"), server)
         loop_rcv = True
         while loop_rcv:
             rcv = UDPClientSocket.recvfrom(buffer_size)
